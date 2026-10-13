@@ -27,3 +27,10 @@ it gets a new entry that says so; old entries are never rewritten.
 - **Why:** no API URL in the client bundle, no CORS for data reads, and the build never needs the API.
 - **Trade-off:** `HealthResponse` is copied by hand from the backend and trusted with `as`; a renamed
   field breaks at runtime, not at compile time. Accepted for the warm-up; Feria shares Zod contracts.
+
+## E0-04 — PostgreSQL 18 in Docker Compose
+
+- **Decision:** one Compose service, `db` (`postgres:18-alpine`), published on host port 5433, with a
+  named volume at `/var/lib/postgresql` and a TCP `pg_isready` healthcheck. The apps run on the host.
+- **Why:** native hot reload and debugging on Windows; 5433 avoids the lab container that owns 5432.
+- **Trade-off:** local runs don't exercise a production image yet. No Redis until the cart (E4).
