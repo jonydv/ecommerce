@@ -17,6 +17,9 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     defaults: { run: { working-directory: backend } }
+    env:
+      DATABASE_URL: postgresql://ecommerce:ecommerce@localhost:5433/ecommerce_test
+      FRONTEND_ORIGIN: http://localhost:3000
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

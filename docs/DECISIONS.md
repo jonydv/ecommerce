@@ -42,3 +42,11 @@ it gets a new entry that says so; old entries are never rewritten.
 - **Why:** CI runs the same commands as local development; independent jobs keep failures readable.
 - **Trade-off:** no branch protection yet (single developer). Milestones are annotated tags
   (`starter-v0`, `starter-v1`, …).
+
+## E1-01 — Prisma 7 and the Product model
+
+- **Decision:** Prisma 7.10.0 pinned exactly (CLI and client), driver adapter `@prisma/adapter-pg`,
+  prices stored as integer cents, generated client git-ignored and rebuilt on `postinstall`.
+- **Why:** the CLI's `latest` tag is an 8.0 release candidate; floats can't represent money exactly.
+- **Trade-off:** services use `PrismaService` directly, without a repository port. Fine for a
+  single-seller warm-up; Feria puts the ORM behind a port.
