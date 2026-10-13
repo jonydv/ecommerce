@@ -19,3 +19,11 @@ it gets a new entry that says so; old entries are never rewritten.
   with a Zod schema in `src/config/env.schema.ts`, CORS limited to `FRONTEND_ORIGIN` with credentials.
 - **Why:** fail fast on bad config; the browser will call the API directly for auth in E2.
 - **Trade-off:** the health type is duplicated in the frontend by hand (no shared package by design).
+
+## E0-03 — Next.js frontend, server-side calls to the API
+
+- **Decision:** Next.js 16 App Router (TypeScript, Tailwind, ESLint as generated). The home page is
+  an async Server Component that calls the API through the server-only `API_URL`, with `no-store`.
+- **Why:** no API URL in the client bundle, no CORS for data reads, and the build never needs the API.
+- **Trade-off:** `HealthResponse` is copied by hand from the backend and trusted with `as`; a renamed
+  field breaks at runtime, not at compile time. Accepted for the warm-up; Feria shares Zod contracts.
