@@ -50,3 +50,20 @@ it gets a new entry that says so; old entries are never rewritten.
 - **Why:** the CLI's `latest` tag is an 8.0 release candidate; floats can't represent money exactly.
 - **Trade-off:** services use `PrismaService` directly, without a repository port. Fine for a
   single-seller warm-up; Feria puts the ORM behind a port.
+
+## E1-02 — Products, end to end
+
+- **Decision:** `GET /products` uses cursor pagination (`limit` 1–50, `cursor` uuid, fetch limit+1).
+  Global `ValidationPipe` with `whitelist` and `transform`, class-validator DTOs. Prices travel as
+  integer cents; the frontend formats them with `Intl.NumberFormat('es-AR', ARS)`.
+- **Why:** offset pagination slows down and skips rows under writes; formatting is presentation.
+- **Debt:** `Product` is copied by hand into `frontend/src/lib/types.ts`. A renamed field breaks at
+  runtime, not at compile time. Feria solves this with a shared contracts package.
+
+## E1-03 — One error contract, request ids
+
+- **Decision:** a global `@Catch()` filter returns `{ statusCode, error, message, path, requestId,
+timestamp }` for every error. `HttpException`s keep their message; Prisma `P2002` → 409,
+  `P2025` → 404; anything else is a generic 500 and the stack only goes to the logs.
+- **Why:** one parser on the client; no internals leaked; every response carries `x-request-id`.
+- **Fixes:** the earlier draft returned `exception.message` for everything, leaking internals on 500s.

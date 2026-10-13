@@ -1,22 +1,33 @@
-import { getHealth } from '@/lib/api';
+import { getProducts } from '@/lib/api';
+import { formatPrice } from '@/lib/money';
 
 export default async function Home() {
-  const health = await getHealth();
-
+  const { items } = await getProducts(12);
   return (
-    <main className='mx-auto w-full max-w-xl px-6 py-16'>
-      <h1 className='text-3xl font-semibold tracking-tight'>Tienda</h1>
-      {health ? (
-        <p className='mt-6 rounded-lg border border-green-600 p-4'>
-          Backend: <strong>{health.status}</strong> · arriba hace{' '}
-          {health.uptime} s
-        </p>
-      ) : (
-        <p className='mt-6 rounded-lg border border-red-600 p-4'>
-          Backend caído: ¿está corriendo <code>npm run start:dev</code> en{' '}
-          <code>backend/</code>?
-        </p>
+    <main className='mx-auto w-full max-w-6xl px-6 py-12'>
+      <h1 className='mb-8 text-3xl font-semibold tracking-tight'>Productos</h1>
+      {items.length === 0 && (
+        <p className='text-zinc-500'>No hay productos. ¿Corriste el seed?</p>
       )}
+      <ul className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+        {items.map((p) => (
+          <li
+            key={p.id}
+            className='flex flex-col rounded-xl border border-zinc-200 p-5 dark:border-zinc-800'
+          >
+            <h2 className='text-lg font-medium'>{p.name}</h2>
+            <p className='mt-1 flex-1 text-sm text-zinc-500'>{p.description}</p>
+            <div className='mt-4 flex items-baseline justify-between'>
+              <span className='text-xl font-semibold'>
+                {formatPrice(p.priceCents)}
+              </span>
+              <span className='text-xs text-zinc-500'>
+                {p.stock > 0 ? `${p.stock} en stock` : 'Sin stock'}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
