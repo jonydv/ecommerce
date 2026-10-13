@@ -34,3 +34,11 @@ it gets a new entry that says so; old entries are never rewritten.
   named volume at `/var/lib/postgresql` and a TCP `pg_isready` healthcheck. The apps run on the host.
 - **Why:** native hot reload and debugging on Windows; 5433 avoids the lab container that owns 5432.
 - **Trade-off:** local runs don't exercise a production image yet. No Redis until the cart (E4).
+
+## E0-05 — CI with one job per app
+
+- **Decision:** GitHub Actions workflow `ci` with two parallel jobs, `backend` (npm ci, lint, build,
+  test) and `frontend` (npm ci, lint, build), Node from `.nvmrc`, npm cache keyed on each lockfile.
+- **Why:** CI runs the same commands as local development; independent jobs keep failures readable.
+- **Trade-off:** no branch protection yet (single developer). Milestones are annotated tags
+  (`starter-v0`, `starter-v1`, …).
