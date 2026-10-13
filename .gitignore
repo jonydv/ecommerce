@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.next/
+*.tsbuildinfo
+
+# env files: the real ones never go to git (the .env.example files do)
+.env
+.env.local
+
+# Prisma generated client (from E1)
+backend/src/generated/
+
+# logs and OS noise
+*.log
+.DS_Store
+Thumbs.db
