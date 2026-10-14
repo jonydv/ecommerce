@@ -75,3 +75,16 @@ timestamp }` for every error. `HttpException`s keep their message; Prisma `P2002
   the e2e suite runs against a real Postgres (`ecommerce_test` locally, a `services:` container in CI).
 - **Why:** a database check in liveness turns a DB hiccup into a restart storm; mocks can't catch SQL bugs.
 - **Trade-off:** the test database is shared between runs; Feria uses Testcontainers instead.
+
+## E2-01 — Users and password hashing
+
+- **Decision:** Argon2id (19 MiB, t=2, p=1). Emails stored normalized with a plain unique
+  constraint. Registration always answers 202. Admins come from the seed only.
+- **Why:** Prisma can't declare an index on `lower(email)`; a 409 would enumerate users.
+- **Cost:** uniqueness depends on every write path calling `normalizeEmail`.
+
+## E2-02 — Login and session cookie
+
+- **Decision:** 1-day HS256 JWT (`@nestjs/jwt`) in an HttpOnly, SameSite=Lax `session` cookie; own guard.
+- **Rejected:** Passport (hides the mechanics); `@nestjs/authentication` (0.0.1); `jose` (less common in Nest).
+- **Known limitation:** no refresh token, so a copied token can't be revoked before it expires.

@@ -21,3 +21,17 @@ model Product {
   @@index([createdAt(sort: Desc), id(sort: Desc)]) // The list order of E1-02
   @@map("products")
 }
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique            // ALWAYS stored normalized: trim + lowercase
+  passwordHash String   @map("password_hash")
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  @@map("users")
+}
