@@ -23,3 +23,15 @@ export interface ApiError {
   requestId: string;
   timestamp: string;
 }
+
+// Copied BY HAND from the backend (GET /auth/me). If the backend renames a field,
+// the frontend finds out at runtime, not at compile time.
+
+export type Role = 'CUSTOMER' | 'ADMIN';
+
+export interface User {
+  id: string;
+  email: string;
+  role: Role;
+  createdAt: string; // a Date in the backend; JSON turns it into a string
+}
