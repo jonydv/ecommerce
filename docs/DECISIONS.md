@@ -67,3 +67,11 @@ timestamp }` for every error. `HttpException`s keep their message; Prisma `P2002
   `P2025` → 404; anything else is a generic 500 and the stack only goes to the logs.
 - **Why:** one parser on the client; no internals leaked; every response carries `x-request-id`.
 - **Fixes:** the earlier draft returned `exception.message` for everything, leaking internals on 500s.
+
+## E1-04 — Health checks and tests
+
+- **Decision:** `@nestjs/terminus` 12.1.0 with `HealthIndicatorService`: `/health/live` has no
+  dependencies, `/health/ready` runs `SELECT 1` with a 1 s timeout. Unit tests mock `PrismaService`;
+  the e2e suite runs against a real Postgres (`ecommerce_test` locally, a `services:` container in CI).
+- **Why:** a database check in liveness turns a DB hiccup into a restart storm; mocks can't catch SQL bugs.
+- **Trade-off:** the test database is shared between runs; Feria uses Testcontainers instead.

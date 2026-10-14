@@ -7,5 +7,10 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.e2e-spec.ts'],
+    env: {
+      DATABASE_URL:
+        process.env.TEST_DATABASE_URL ??
+        'postgresql://ecommerce:ecommerce@localhost:5433/ecommerce_test',
+    },
   },
 });

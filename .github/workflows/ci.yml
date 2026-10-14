@@ -17,6 +17,18 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     defaults: { run: { working-directory: backend } }
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          {
+            POSTGRES_USER: ecommerce,
+            POSTGRES_PASSWORD: ecommerce,
+            POSTGRES_DB: ecommerce_test,
+          }
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     env:
       DATABASE_URL: postgresql://ecommerce:ecommerce@localhost:5433/ecommerce_test
       FRONTEND_ORIGIN: http://localhost:3000
@@ -33,6 +45,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
+      - run: npm run test:e2e
 
   frontend:
     runs-on: ubuntu-latest
