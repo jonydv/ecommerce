@@ -1,5 +1,5 @@
-import { getProducts } from '@/lib/api';
-import { formatPrice } from '@/lib/money';
+import { getProducts } from '@/features/catalog/api';
+import { formatPrice } from '@/shared/lib/money';
 
 export default async function Home() {
   const { items } = await getProducts(12);

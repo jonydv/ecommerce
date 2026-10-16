@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { getMe } from '@/lib/api';
-import { LogoutButton } from './logout-button';
+import { getMe } from '@/features/auth/api';
+import { LogoutButton } from '@/features/auth/components/logout-button';
 
 export default async function AccountPage() {
   const me = await getMe();

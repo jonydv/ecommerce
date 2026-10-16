@@ -144,3 +144,16 @@ reaches 1.0; or a frontend must live on a different site.
 - **Revisit when:** a second provider arrives (Apple, GitHub: same table, another `AuthProvider`); signups get email
   verification (then linking no longer needs to drop the password); or Angular needs Google redirects to its own
   origin (today they return to `FRONTEND_ORIGIN`).
+
+## E3-00 — A feature-based frontend, and English routes
+
+- **Decision:** `src/app/` holds routes only (pages, layouts, and `_components/` for the root layout's
+  pieces). `src/features/<domain>/` holds everything about one domain: `api.ts` (server-only reads),
+  `actions.ts` (Server Actions), `types.ts` (copied by hand from the backend, one file per domain) and
+  `components/`. `src/shared/` holds what belongs to no domain: the HTTP client, the `ApiError` contract,
+  `PUBLIC_API_URL`, money formatting. Dependencies point one way (app → features → shared), enforced by
+  `no-restricted-imports` in ESLint. No barrel files: deep imports only. Routes and query params in
+  English (`/account`, `/products/[slug]`, `?category=`); UI copy in Spanish.
+- **Cost:** more folders for a small app, and long imports. A feature may import another feature
+  (the cart uses the catalog's `Product`), and the lint rule doesn't catch cycles between features.
+- **Revisit:** when types come from a shared contract (Feria), `features/*/types.ts` become generated.

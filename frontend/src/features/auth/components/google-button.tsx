@@ -1,6 +1,7 @@
 // E2-05 · a LINK, not fetch: the browser has to NAVIGATE to Nest, which sends it to Google's screen and back.
 // No 'use client': it's plain HTML, it works even before React loads.
-const API = process.env.NEXT_PUBLIC_API_URL;
+import { PUBLIC_API_URL } from '@/shared/config/public-env';
+const API = PUBLIC_API_URL;
 
 export function GoogleButton({ returnTo = '/account' }: { returnTo?: string }) {
   return (

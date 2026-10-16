@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { PUBLIC_API_URL } from '@/shared/config/public-env';
 
 export function LogoutButton() {
   const router = useRouter();
   async function logout() {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+    await fetch(`${PUBLIC_API_URL}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     });

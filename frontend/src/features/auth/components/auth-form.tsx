@@ -2,8 +2,9 @@
 
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { PUBLIC_API_URL } from '@/shared/config/public-env';
 
-const API = process.env.NEXT_PUBLIC_API_URL;
+const API = PUBLIC_API_URL;
 
 export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const router = useRouter();

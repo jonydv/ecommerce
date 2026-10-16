@@ -1,6 +1,9 @@
 import Link from 'next/link';
-import { AuthForm } from './auth-form';
-import { GOOGLE_ERRORS, GoogleButton } from './google-button';
+import { AuthForm } from '@/features/auth/components/auth-form';
+import {
+  GOOGLE_ERRORS,
+  GoogleButton,
+} from '@/features/auth/components/google-button';
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   const { error } = await searchParams; // E2-05: Nest sends /login?error=… when Google failed
@@ -23,7 +26,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
       </p>
       <AuthForm mode='login' />
       <p className='mt-4'>
-        ¿No tenés cuenta? <Link href='/registro'>Creá una</Link>
+        ¿No tenés cuenta? <Link href='/register'>Creá una</Link>
       </p>
     </main>
   );

@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { AuthForm } from '../login/auth-form';
-import { GoogleButton } from '../login/google-button';
+import { AuthForm } from '@/features/auth/components/auth-form';
+import { GoogleButton } from '@/features/auth/components/google-button';
 
 export default function RegisterPage() {
   return (
