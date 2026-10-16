@@ -25,7 +25,6 @@ jobs:
             POSTGRES_USER: ecommerce,
             POSTGRES_PASSWORD: ecommerce,
             POSTGRES_DB: ecommerce_test,
-            JWT_SECRET: ci-only-secret-with-at-least-32-characters,
           }
         ports: ['5433:5432']
         options: >-
@@ -33,6 +32,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://ecommerce:ecommerce@localhost:5433/ecommerce_test
       FRONTEND_ORIGIN: http://localhost:3000
+      JWT_SECRET: ci-only-secret-with-at-least-32-characters
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
