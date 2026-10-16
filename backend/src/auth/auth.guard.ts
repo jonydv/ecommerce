@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Observable } from 'rxjs';
 import { AuthedRequest, JwtPayload, SESSION_COOKIE } from './session.js';
 
 @Injectable()
