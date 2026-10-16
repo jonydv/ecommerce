@@ -88,3 +88,59 @@ timestamp }` for every error. `HttpException`s keep their message; Prisma `P2002
 - **Decision:** 1-day HS256 JWT (`@nestjs/jwt`) in an HttpOnly, SameSite=Lax `session` cookie; own guard.
 - **Rejected:** Passport (hides the mechanics); `@nestjs/authentication` (0.0.1); `jose` (less common in Nest).
 - **Known limitation:** no refresh token, so a copied token can't be revoked before it expires.
+
+## E2-03 — Next.js with a Nest-owned session
+
+- **Decision:** browser → Nest directly for login/logout (`credentials: 'include'`); Server Components
+  forward only the `session` cookie to `/auth/me` and redirect on 401. No `proxy.ts`.
+- **Cost:** every Server Component that needs the user forwards the cookie by hand.
+- **Production:** vercel.app + onrender.com would make it third-party; E9 uses app./api. subdomains.
+
+## E2 — Authentication: the API owns the session
+
+**Context.** Next.js is the first frontend; an Angular frontend comes later (E10) and must reuse
+authentication without rewriting it. Warm-up project: one developer, no identity provider.
+
+**Decision.**
+
+- NestJS owns the session: Argon2id hashing, login, a one-day HS256 JWT in an `HttpOnly`,
+  `SameSite=Lax`, `Path=/` cookie (`Secure` in production). Roles via `@Roles()` + `RolesGuard`.
+- Development: the browser calls Nest directly for login/logout (`credentials: 'include'`, CORS with
+  an explicit origin and `credentials: true`). localhost:3000 and :3001 are the same site.
+- Server Components read the cookie with `cookies()` and forward it in the `Cookie` header.
+- Production (E9): one owned domain, `app.` and `api.` subdomains, so the cookie stays first-party.
+
+**Alternatives rejected.**
+
+- _Next.js owns the session (Auth.js as a BFF):_ solid, but ties the session to Next; Angular
+  could not reuse it without going through Next.
+- _JWT in `localStorage` + `Authorization` header:_ any XSS can export the token.
+- _Next.js proxies every API call:_ works and avoids CORS, but hides credentialed CORS, which
+  is the thing to learn here, and Angular would need its own proxy.
+
+**Consequences.**
+
+- (+) Any browser client on the same site gets auth for free; the API is testable with curl.
+- (−) Every Server Component that needs the user forwards the cookie by hand.
+- (−) No refresh token: a copied token can't be revoked, and role changes apply on expiry (≤ 1 day).
+- (−) Production needs an owned domain, which costs money; vercel.app + onrender.com won't work.
+
+**Revisit when.** E10 connects Angular (this decision's test); revocation or "log out everywhere"
+becomes a requirement (move to an opaque, rotating refresh token, as in B3); `@nestjs/authentication`
+reaches 1.0; or a frontend must live on a different site.
+
+## E2-05 — Sign-in with Google
+
+- **Decision:** OpenID Connect, authorization code flow with PKCE, run by the API (`openid-client`). `/auth/google`
+  stores state, nonce and the PKCE verifier in a signed, 10-minute, HttpOnly cookie scoped to `/auth/google`;
+  the callback validates the ID token and issues the same session cookie as the password login. External accounts
+  live in `auth_identities`, unique on (provider, subject). Auto-link by email only when Google says
+  `email_verified`, and the first link clears the unverified local password (account pre-hijacking).
+  `returnTo` only accepts paths of our own front.
+- **Why:** the API owns the session (E2), so Next and Angular get Google sign-in with no extra code. `sub` is
+  Google's stable identifier; emails can change.
+- **Not done:** email verification for password signups; linking a second provider from the account page; showing
+  the Google name or picture.
+- **Revisit when:** a second provider arrives (Apple, GitHub: same table, another `AuthProvider`); signups get email
+  verification (then linking no longer needs to drop the password); or Angular needs Google redirects to its own
+  origin (today they return to `FRONTEND_ORIGIN`).

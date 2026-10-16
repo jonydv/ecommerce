@@ -30,8 +30,30 @@ enum Role {
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   email        String   @unique            // ALWAYS stored normalized: trim + lowercase
-  passwordHash String   @map("password_hash")
+  passwordHash String?  @map("password_hash") // E2-05: null = this user only signs in with Google
+  emailVerifiedAt DateTime? @map("email_verified_at") // E2-05: when Google vouched for this email
   role         Role     @default(CUSTOMER)
   createdAt    DateTime @default(now()) @map("created_at")
+  identities   AuthIdentity[] // E2-05: the external accounts linked to this user
+
   @@map("users")
+}
+
+// E2-05 · sign-in with Google. One row per external account linked to a user (Google today, others tomorrow).
+enum AuthProvider {
+  GOOGLE
+}
+
+model AuthIdentity {
+  id        String       @id @default(uuid()) @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  AuthProvider
+  subject   String // Google's `sub`: stable and never reused. The email is NOT the key: it can change
+  email     String // the email the provider sent the last time, for display only
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  @@unique([provider, subject])
+  @@index([userId])
+  @@map("auth_identities")
 }

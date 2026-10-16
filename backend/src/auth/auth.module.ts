@@ -5,6 +5,9 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { AuthGuard } from './auth.guard.js';
 import type { Env } from '../config/env.schema.js';
+import { GoogleAuthController } from './google/google-auth.controller.js';
+import { GoogleOidc } from './google/google-oidc.js';
+import { GoogleAccountsService } from './google/google-accounts.service.js';
 
 @Module({
   imports: [
@@ -17,8 +20,8 @@ import type { Env } from '../config/env.schema.js';
       }),
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, AuthGuard],
+  controllers: [AuthController, GoogleAuthController],
+  providers: [AuthService, AuthGuard, GoogleOidc, GoogleAccountsService],
   exports: [AuthGuard, JwtModule], // E2-04's AdminModule reuses both
 })
 export class AuthModule {}

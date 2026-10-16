@@ -17,11 +17,18 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: normalizeEmail(rawEmail) },
     });
+    // E2-05: a Google-only user has no password → the decoy too: same time, same 401
     const ok = await verifyPassword(
       user?.passwordHash ?? (await this.dummyHash),
       password,
     );
-    if (!user || !ok) throw new UnauthorizedException('invalid credentials'); // SAME message
+    if (!user?.passwordHash || !ok)
+      throw new UnauthorizedException('invalid credentials'); // SAME message
+    return this.sessionFor(user);
+  }
+
+  // E2-05: the session token, whoever proved who they are (a password here, Google in GoogleAuthController)
+  sessionFor(user: { id: string; role: JwtPayload['role'] }): Promise<string> {
     const payload: JwtPayload = { sub: user.id, role: user.role };
     return this.jwt.signAsync(payload);
   }
